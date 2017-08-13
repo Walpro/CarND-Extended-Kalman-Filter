@@ -37,14 +37,11 @@ void KalmanFilter::Update(const VectorXd &z) {
   */
 
 	VectorXd y;
-	MatrixXd K,S, I;
+	MatrixXd K,S;
 
 	// identity 4 matrix
-	I = MatrixXd(4,4);
-	I << 1,0,0,0,
-			0,1,0,0,
-			0,0,1,0,
-			0,0,0,1;
+	 MatrixXd I = MatrixXd::Identity(4, 4);
+
 	// updating the state
 	y = z - H_*x_;
 
@@ -70,14 +67,10 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 	float vy = x_(3);
 	VectorXd y;
 	VectorXd Hx = VectorXd(3);
-	MatrixXd K, S, I;
+	MatrixXd K, S;
 
-	// identity matrix
-	I = MatrixXd(4,4);
-	I << 1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		0,0,0,1;
+	// identity 4 matrix
+	MatrixXd I = MatrixXd::Identity(4, 4);
 
 	rho = sqrt(x1 * x1 + y1 * y1);
 	theta = atan2(y1, x1);
@@ -87,6 +80,10 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 
 	// updating the state
 	y = z - Hx;
+
+	// normalizing the angle
+	y(1) = std::atan2( sin( y(1)), cos(y(1)));
+
 	S = H_ * P_ * H_.transpose() + R_;
 	K = P_ * H_.transpose() * S.inverse();
 
